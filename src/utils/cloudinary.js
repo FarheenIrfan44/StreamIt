@@ -14,7 +14,8 @@ import fs from 'fs'
                 resource_type: "auto"
             })
 
-            console.log("Uploaded successfully on cloudinary", response.url);
+           
+            fs.unlinkSync(localFilePath)
             return response;
         } catch (error) {
             fs.unlinkSync(localFilePath);
