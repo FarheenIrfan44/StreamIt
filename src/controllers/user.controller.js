@@ -176,7 +176,7 @@ const refreshAccessToken = asyncHandler(async (req, res) => {
     );
 
     const user = await User.findById(decodedToken?._id);
-    if (incomingRefreshToken) {
+    if (!incomingRefreshToken) {
       throw new ApiError(401, "Unauthorized request.");
     }
 
