@@ -10,11 +10,65 @@ import {uploadOnCloudinary} from "../utils/cloudinary.js"
 const getAllVideos = asyncHandler(async (req, res) => {
     const { page = 1, limit = 10, query, sortBy, sortType, userId } = req.query
     //TODO: get all videos based on query, sort, pagination
+
 })
 
 const publishAVideo = asyncHandler(async (req, res) => {
-    const { title, description} = req.body
+    const { title, description} = req.body;
+    if(!title || !description){
+        throw new ApiError(400, "Title and description required.");
+    }
+    const videoLocalPath = req.files?.videoFile[0]?.path;
+    console.log(videoLocalPath);
+
+    const thumbnailLocalPath = req.files?.thumbnail[0].path;
+    console.log(thumbnailLocalPath);
+
+    if (!videoLocalPath || !thumbnailLocalPath) {
+         throw new ApiError(400, "Video and thumbnail is required.");
+    }
+
+    const videoFile = await uploadOnCloudinary(videoLocalPath);
+    console.log(videoFile);
+    
+    const thumbnail = await uploadOnCloudinary(thumbnailLocalPath);
+    console.log(thumbnail);
+    
+
+    if(!videoFile){
+         throw new ApiError(400, "Video is required.");
+    }
+    if(!thumbnail){
+         throw new ApiError(400, "Thumbnail is required.");
+    }
+
+    const owner = req.user._id;
+    console.log(owner);
+
+    const duration = videoFile?.duration;
+    console.log(duration);
+    if (!duration || duration < 1) {
+        throw new ApiError(400, "Video duration must be at least 1 second.");
+    }
+    
+
     // TODO: get video, upload to cloudinary, create video
+
+    const newVideo = await Video.create({
+        videoFile: videoFile.url,
+        thumbnail: thumbnail.url,
+        owner,
+        title,
+        description,
+        duration,
+        views: 0,
+        isPublished: true
+    });
+
+    console.log(newVideo);
+    return res.status(200)
+    .json(new ApiResponse(200, newVideo, "Video published successfully."))
+    
 })
 
 const getVideoById = asyncHandler(async (req, res) => {

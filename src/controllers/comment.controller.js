@@ -9,6 +9,14 @@ const getVideoComments = asyncHandler(async (req, res) => {
     const {videoId} = req.params
     const {page = 1, limit = 10} = req.query
 
+    //i should have a video id
+    //Search for the comments using that video id in comment table. 
+    //Get those comments.
+
+    const comments = Comment.findById(videoId);
+    console.log(comments);
+    
+
 })
 
 const addComment = asyncHandler(async (req, res) => {
