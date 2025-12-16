@@ -43,10 +43,10 @@ const publishAVideo = asyncHandler(async (req, res) => {
     }
 
     const owner = req.user._id;
-    console.log(owner);
+    //console.log(owner);
 
     const duration = videoFile?.duration;
-    console.log(duration);
+    //console.log(duration);
     if (!duration || duration < 1) {
         throw new ApiError(400, "Video duration must be at least 1 second.");
     }
@@ -65,15 +65,26 @@ const publishAVideo = asyncHandler(async (req, res) => {
         isPublished: true
     });
 
-    console.log(newVideo);
+    //console.log(newVideo);
     return res.status(200)
     .json(new ApiResponse(200, newVideo, "Video published successfully."))
     
 })
 
 const getVideoById = asyncHandler(async (req, res) => {
-    const { videoId } = req.params
     //TODO: get video by id
+    const { videoId } = req.params;
+    if(!videoId){
+        throw new ApiError(400, "The video does not exist.")
+    }
+
+    const video = await Video.findById(videoId);
+    //console.log(video);
+
+    return res.status(200).json(
+        new ApiResponse(200, video, "The video is fetched successfully.")
+    )
+    
 })
 
 const updateVideo = asyncHandler(async (req, res) => {
@@ -83,8 +94,19 @@ const updateVideo = asyncHandler(async (req, res) => {
 })
 
 const deleteVideo = asyncHandler(async (req, res) => {
-    const { videoId } = req.params
     //TODO: delete video
+    const { videoId } = req.params;
+    if(!videoId){
+        throw new ApiError(404, "The video does not exist.")
+    }
+
+    const video = await Video.findByIdAndDelete(videoId);
+    console.log(video);
+    return res.status(200).json(
+        new ApiResponse(200, video, "The video is deleted successfully.")
+    )
+    
+    
 })
 
 const togglePublishStatus = asyncHandler(async (req, res) => {
